@@ -1,3 +1,6 @@
+const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+chrome.runtime.sendMessage({ type: 'THEME_CHANGE', isDark: isDark });
+
 const unlockBtn = document.getElementById('unlockBtn');
 const lockStatus = document.getElementById('lockStatus'); // Matches your HTML B tag
 const stateEl = document.getElementById('state');         // Matches your HTML B tag
@@ -9,19 +12,25 @@ function updateUI() {
     // Check if vault has any actual data keys
     const hasData = res.vault && Object.keys(res.vault).length > 0;
     stateEl.innerText = res.enabled ? "ON" : "OFF";
+    stateEl.classList.remove('on', 'off');
+    stateEl.classList.add(res.enabled ? "on" : "off");
     
     chrome.storage.session.get(['sessionPassword'], (sess) => {
       const isUnlocked = !!sess.sessionPassword;
 
+      lockStatus.classList.remove('unlocked', 'locked', 'new-user');
       if (isUnlocked) {
+        lockStatus.classList.add('unlocked');
         lockStatus.innerText = "UNLOCKED";
         unlockBtn.innerText = "Change Master Password";
         document.getElementById('dangerZone').style.display = "none";
       } else if (hasData) {
+        lockStatus.classList.add('locked');
         lockStatus.innerText = "LOCKED";
         unlockBtn.innerText = "Enter Password";
         document.getElementById('dangerZone').style.display = "block";
       } else {
+        lockStatus.classList.add('new-user');
         lockStatus.innerText = "NEW USER";
         unlockBtn.innerText = "Set Master Password";
         document.getElementById('dangerZone').style.display = "none";

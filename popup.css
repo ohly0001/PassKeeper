@@ -1,0 +1,33 @@
+body { 
+    width: 220px;
+    font-family: sans-serif; 
+    padding: 10px;
+}
+input, button { 
+    width: 100%; 
+    margin-bottom: 8px; 
+    box-sizing: border-box; 
+}
+.status { 
+    font-size: 12px; 
+    margin-bottom: 10px; 
+}
+.off {
+    color: coral;
+}
+.on {
+    color: limegreen;
+}
+.unlocked {
+    color: limegreen;
+}
+.locked {
+    color: coral;
+}
+.new-user {
+    color: royalblue;
+}
+#dangerZone {
+    margin-top: 20px; 
+    display: none;
+}

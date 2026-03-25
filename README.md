@@ -1,0 +1,1 @@
+[Icon created by Andrejs Kirma - Flaticon](https://www.flaticon.com/free-icons/vault)

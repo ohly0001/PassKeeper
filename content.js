@@ -26,7 +26,7 @@ async function handleSave(input) {
     else data.vault[hostname].push(entry);
 
     chrome.storage.local.set({ vault: data.vault });
-    input.style.border = "2px solid green";
+    input.style.border = "2px solid ";
     setTimeout(() => input.style.border = "", 1000);
   });
 }
