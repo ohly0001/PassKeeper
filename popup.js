@@ -2,8 +2,8 @@ const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 chrome.runtime.sendMessage({ type: 'THEME_CHANGE', isDark: isDark });
 
 const unlockBtn = document.getElementById('unlockBtn');
-const lockStatus = document.getElementById('lockStatus'); // Matches your HTML B tag
-const stateEl = document.getElementById('state');         // Matches your HTML B tag
+const lockStatus = document.getElementById('lockStatus'); 
+const stateEl = document.getElementById('state');        
 const pwdInput = document.getElementById('pwd');
 
 // 1. UI Sync: Runs every time the popup opens
