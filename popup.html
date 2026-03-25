@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { width: 220px; font-family: sans-serif; padding: 10px; }
+    input, button { width: 100%; margin-bottom: 8px; box-sizing: border-box; }
+    .status { font-size: 12px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="status">
+    Switch: <b id="state">OFF</b> | 
+    Status: <b id="lockStatus">NEW USER</b>
+  </div>
+  <button id="toggleBtn">Toggle Master Switch</button>
+  <hr>
+  <input type="password" id="pwd" placeholder="Password">
+  <!-- This button text will change dynamically -->
+  <button id="unlockBtn">Set Master Password</button> 
+  <div id="dangerZone" style="margin-top: 20px; display: none;">
+    <p style="font-size: 10px; color: red;">Forgotten password? This wipes all data:</p>
+    <button id="resetVault" style="background: #ffcccc;">Wipe & Reset Vault</button>
+  </div>
+  <hr>
+  <button id="exportBtn">Export Vault (Encrypted)</button>
+  <button id="importBtn">Import Vault</button>
+  <input type="file" id="fileInput" style="display:none">
+  <script src="crypto-util.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

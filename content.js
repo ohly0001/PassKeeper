@@ -1,102 +1,64 @@
 const hostname = window.location.hostname;
-let typingTimer; // The "Wait" timer
-const DONE_TYPING_INTERVAL = 1000; // 1 second of no typing before saving
+let typingTimer;
 
-/**
- * 1. THE FINGERPRINTING LOGIC (Remains the same)
- */
 function getFingerprint(input) {
-  let labelText = "";
-  const labelEl = document.querySelector(`label[for="${input.id}"]`);
-  labelText = labelEl ? labelEl.innerText.trim() : (input.closest('label')?.innerText.trim() || "");
-
   return {
-    autocomplete: input.autocomplete || "",
-    label: labelText.split('\n')[0], // First line only
-    placeholder: input.placeholder || "",
+    label: input.labels?.[0]?.innerText || input.placeholder || input.name || "field",
     name: input.name || "",
-    type: input.type
+    placeholder: input.placeholder || ""
   };
 }
 
-/**
- * 2. THE SAVE FUNCTION (Only called after the pause)
- */
-function commitToVault(input) {
+async function handleSave(input) {
+  const { enabled } = await chrome.storage.local.get('enabled');
+  const { sessionPassword } = await chrome.storage.session.get('sessionPassword');
+  if (!enabled || !sessionPassword || !input.value) return;
+
   const fingerprint = getFingerprint(input);
-  const value = input.value;
+  const encryptedValue = await encrypt(input.value, sessionPassword);
 
   chrome.storage.local.get({ vault: {} }, (data) => {
     if (!data.vault[hostname]) data.vault[hostname] = [];
-    
-    // Find the existing record by semantic fingerprint
-    const existingIdx = data.vault[hostname].findIndex(f => 
-      (f.fingerprint.label && f.fingerprint.label === fingerprint.label) || 
-      (f.fingerprint.name && f.fingerprint.name === fingerprint.name) ||
-      (f.fingerprint.placeholder && f.fingerprint.placeholder === fingerprint.placeholder)
-    );
+    const idx = data.vault[hostname].findIndex(f => f.fingerprint.label === fingerprint.label);
+    const entry = { fingerprint, value: encryptedValue };
 
-    if (value.length === 0) {
-      // If user cleared the field, delete it from storage
-      if (existingIdx > -1) data.vault[hostname].splice(existingIdx, 1);
-    } else {
-      // Update or Add new entry
-      const entry = { fingerprint, value, timestamp: Date.now() };
-      if (existingIdx > -1) {
-        data.vault[hostname][existingIdx] = entry;
-      } else {
-        data.vault[hostname].push(entry);
-      }
-    }
+    if (idx > -1) data.vault[hostname][idx] = entry;
+    else data.vault[hostname].push(entry);
 
-    chrome.storage.local.set({ vault: data.vault }, () => {
-      console.log("✅ Saved to Vault:", fingerprint.label || fingerprint.name || "Field");
-      // Visual feedback: brief green flash
-      input.style.transition = "box-shadow 0.2s";
-      input.style.boxShadow = "0 0 8px green";
-      setTimeout(() => input.style.boxShadow = "none", 500);
-    });
+    chrome.storage.local.set({ vault: data.vault });
+    input.style.border = "2px solid green";
+    setTimeout(() => input.style.border = "", 1000);
   });
 }
 
-/**
- * 3. THE TYPING LISTENER (The Trigger)
- */
-document.addEventListener('input', (e) => {
-  if (e.target.tagName === 'INPUT') {
-    // Clear the timer every time a key is pressed
-    clearTimeout(typingTimer);
+async function handleFill() {
+  const { enabled } = await chrome.storage.local.get('enabled');
+  const { sessionPassword } = await chrome.storage.session.get('sessionPassword');
+  if (!enabled || !sessionPassword) return;
 
-    // Provide immediate feedback that we are "waiting" to save
-    e.target.style.boxShadow = "0 0 8px orange";
-
-    // Set a new timer
-    typingTimer = setTimeout(() => {
-      commitToVault(e.target);
-    }, DONE_TYPING_INTERVAL);
-  }
-}, true);
-
-/**
- * 4. AUTOFILL LOGIC (Standard strategy)
- */
-const fillFields = () => {
-  chrome.storage.local.get('vault', (data) => {
+  chrome.storage.local.get('vault', async (data) => {
     const siteData = data.vault?.[hostname];
     if (!siteData) return;
 
-    siteData.forEach(item => {
-      // Simple selector-based find (reuse your findField function here)
+    for (const item of siteData) {
       const field = document.querySelector(`input[name="${item.fingerprint.name}"]`) || 
                     document.querySelector(`input[placeholder="${item.fingerprint.placeholder}"]`);
-      
       if (field && !field.value) {
-        field.value = item.value;
-        field.dispatchEvent(new Event('input', { bubbles: true }));
+        const decrypted = await decrypt(item.value, sessionPassword);
+        if (decrypted) {
+          field.value = decrypted;
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+        }
       }
-    });
+    }
   });
-};
+}
 
-// Initial fill
-setTimeout(fillFields, 500);
+document.addEventListener('input', (e) => {
+  if (e.target.tagName === 'INPUT') {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => handleSave(e.target), 1000);
+  }
+}, true);
+
+setTimeout(handleFill, 1000);

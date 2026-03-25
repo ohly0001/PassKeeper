@@ -1,13 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Semantic Autofiller",
-  "version": "1.0",
-  "description": "Flexible autofill using semantic labels instead of brittle IDs.",
-  "permissions": ["storage"],
+  "name": "Secure Semantic Vault",
+  "version": "1.2",
+  "permissions": ["storage", "unlimitedStorage"],
+  "action": {
+    "default_popup": "popup.html"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "js": ["crypto-util.js", "content.js"],
       "run_at": "document_idle"
     }
   ]
