@@ -1,33 +1,105 @@
+/* 1. Base / Light Mode Styles */
 body { 
     width: 220px;
+    color: #1f1f1f;
     font-family: sans-serif; 
     padding: 10px;
+    background-color: #ffffff; 
 }
+
 input, button { 
     width: 100%; 
     margin-bottom: 8px; 
     box-sizing: border-box; 
+    transition: background-color 0.3s, color 0.3s; 
 }
+
+input {
+    background-color: #edf2fa;
+    border: 1px solid #ccc;
+    color: #1f1f1f;
+}
+
+button {
+    background-color: #e9eaeb;
+    border: 1px solid #bbb;
+    cursor: pointer;
+    color: #1f1f1f;
+}
+
+button:hover {
+    transform: translate(1px, 1px);
+}
+
+button:active {
+    border-top-color: #000;
+    border-left-color: #000;
+    border-bottom-color: #fff;
+    border-right-color: #fff;
+}
+
+hr {
+    background-color: #edf2fa;
+    height: 2px;
+    border: none;
+}
+
+.resetVault {
+    background-color: #ffcccc;
+}
+
+/* 2. Status & Utility Classes */
 .status { 
     font-size: 12px; 
     margin-bottom: 10px; 
 }
-.off {
-    color: coral;
-}
-.on {
-    color: limegreen;
-}
-.unlocked {
-    color: limegreen;
-}
-.locked {
-    color: coral;
-}
-.new-user {
-    color: royalblue;
-}
+
+.off { color: coral; }
+.on { color: limegreen; }
+.unlocked { color: limegreen; }
+.locked { color: coral; }
+.new-user { color: royalblue; }
+
 #dangerZone {
     margin-top: 20px; 
     display: none;
+}
+
+/* 3. Dark Mode Overrides */
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #c7c7c7;
+        background-color: #3c3c3c;
+    }
+    
+    input {
+        color: #c7c7c7;
+        background-color: #282828;
+        border-color: #555;
+    }
+    
+    button {
+        color: #d6d6d6;
+        background-color: #666666;
+        border-color: #777;
+    }
+
+    /* Subtle adjustment for the 'pressed' look in dark mode */
+    button:active {
+        border-top-color: #1a1a1a;
+        border-left-color: #1a1a1a;
+        border-bottom-color: #888;
+        border-right-color: #888;
+    }
+
+    hr {
+        background-color: #282828;
+    }
+    
+    .resetVault {
+        background-color: #d02d27;
+        color: #fff;
+    }
+
+    .new-user { color: #79a6ff; } 
 }

@@ -11,7 +11,7 @@ function updateUI() {
   chrome.storage.local.get(['vault', 'enabled'], (res) => {
     // Check if vault has any actual data keys
     const hasData = res.vault && Object.keys(res.vault).length > 0;
-    stateEl.innerText = res.enabled ? "ON" : "OFF";
+    stateEl.innerText = res.enabled ? " ON" : "OFF";
     stateEl.classList.remove('on', 'off');
     stateEl.classList.add(res.enabled ? "on" : "off");
     
